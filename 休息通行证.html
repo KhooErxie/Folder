@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>休息通行证</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;600;800&display=swap');
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #FBF1F4;
+    font-family: 'Noto Sans SC', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .wrap { max-width: 420px; width: 100%; text-align: center; position: relative; z-index: 1; }
+
+  .lead {
+    font-size: 14px;
+    color: #B98A9B;
+    margin: 0 0 18px;
+  }
+
+  .pass {
+    position: relative;
+    background: #FFFDFE;
+    border: 2px dashed #F0C7D2;
+    border-radius: 14px;
+    padding: 28px 26px 24px;
+    box-shadow: 0 14px 30px rgba(190, 90, 120, 0.1);
+    overflow: hidden;
+  }
+
+  h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: #7A3E52;
+    margin: 0 0 16px;
+  }
+
+  .field {
+    text-align: left;
+    font-size: 13px;
+    color: #B98A9B;
+    border-top: 1px solid #F3DDE4;
+    padding: 10px 0;
+  }
+  .field b { color: #7A3E52; }
+
+  .stamp {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    width: 84px;
+    height: 84px;
+    border: 3px solid #C96A85;
+    border-radius: 50%;
+    color: #C96A85;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.3;
+    transform: rotate(-14deg) scale(0);
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .stamp span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .stamp.show { transform: rotate(-14deg) scale(1); }
+
+  button {
+    margin-top: 20px;
+    background: #7A3E52;
+    color: #FDF4F7;
+    border: none;
+    padding: 13px 26px;
+    border-radius: 30px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  button:hover { background: #5F2F41; }
+  button:active { transform: scale(0.96); }
+
+
+  .field input {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 16px;
+    color: #7A3E52;
+    background: #FDF4F7;
+    border: 1px solid #F3DDE4;
+    border-radius: 6px;
+    padding: 5px 8px;
+    width: 100%;
+    margin-top: 4px;
+    outline: none;
+  }
+  .field input:focus { border-color: #D98CA6; }
+  .field input::placeholder { color: #D9AEBB; }
+  .field input.invalid {
+    border-color: #C96A85;
+    background: #FBEBF0;
+  }
+  .field input.invalid::placeholder { color: #DFA0AF; }
+
+  .petal {
+    position: fixed;
+    top: -40px;
+    font-size: 20px;
+    animation: fall linear infinite;
+    opacity: 0.75;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <p class="lead">写给今天感觉很累的你</p>
+
+  <div class="pass">
+    <h1>休息通行证</h1>
+    <div class="field"><b>持有人：</b><input type="text" id="f1" placeholder="填你的名字" required></div>
+    <div class="field"><b>事由：</b><input type="text" id="f2" placeholder="填你累的原因" required></div>
+    <div class="field"><b>有效期：</b><input type="text" id="f3" placeholder="填你想休息多久（不要有罪恶感）" required></div>
+    <div class="stamp" id="stamp">已批准<span id="stampBy">by：Erxie</span></div>
+  </div>
+
+  <button type="button" onclick="togglePass()" id="btn">申请休息</button>
+</div>
+
+<script>
+let issued = false;
+function togglePass(){
+  const stamp = document.getElementById('stamp');
+  const btn = document.getElementById('btn');
+  const f1 = document.getElementById('f1');
+  const f2 = document.getElementById('f2');
+  const f3 = document.getElementById('f3');
+
+  if (!issued) {
+    const fields = [f1, f2, f3];
+    let firstInvalid = null;
+    fields.forEach(f => {
+      if (f.value.trim() === "") {
+        f.classList.add('invalid');
+        if (!firstInvalid) firstInvalid = f;
+      } else {
+        f.classList.remove('invalid');
+      }
+    });
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return;
+    }
+    stamp.classList.add('show');
+    document.getElementById('stampBy').textContent = "by：" + f1.value.trim();
+    btn.textContent = "再来一张休息通行证";
+    issued = true;
+  } else {
+    stamp.classList.remove('show');
+    document.getElementById('stampBy').textContent = "by：Erxie";
+    f1.value = "";
+    f2.value = "";
+    f3.value = "";
+    f1.classList.remove('invalid');
+    f2.classList.remove('invalid');
+    f3.classList.remove('invalid');
+    btn.textContent = "申请休息";
+    issued = false;
+  }
+}
+
+['f1','f2','f3'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function(){
+    if (this.value.trim() !== "") this.classList.remove('invalid');
+  });
+});
+
+const petalEmojis = ["🌸","💮","🌷","🍃"];
+for (let i = 0; i < 16; i++) {
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.textContent = petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+  p.style.left = Math.random()*100 + "vw";
+  p.style.animationDuration = (9 + Math.random()*8) + "s";
+  p.style.animationDelay = (Math.random()*10) + "s";
+  p.style.fontSize = (14 + Math.random()*14) + "px";
+  document.body.appendChild(p);
+}
+</script>
+
+</body>
+</html>
